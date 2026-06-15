@@ -6,224 +6,156 @@ const orb = document.getElementById("orb");
 let active = false;
 let retellClient = null;
 
-function agregarMensaje(texto, clase = "message") {
-
-```
-if (!texto) return;
-
-const div = document.createElement("div");
-
-div.className = clase;
-
-div.innerText = texto;
-
-transcript.appendChild(div);
-
-transcript.scrollTop = transcript.scrollHeight;
-```
-
-}
-
 button.addEventListener("click", async () => {
 
-```
-if (!active) {
+    if (!active) {
 
-    try {
+        try {
 
-        active = true;
+            active = true;
 
-        button.innerText = "Finalizar consulta";
+            button.innerText = "Finalizar consulta";
+            statusText.innerText = "Conectando con Blanquita...";
 
-        statusText.innerText =
-            "Conectando con Blanquita...";
+            const response = await fetch("/api/create-web-call");
+            const data = await response.json();
 
-        transcript.innerHTML = "";
+            console.log("SDK:", window.RetellSDK);
 
-        const response =
-            await fetch("/api/create-web-call");
+            retellClient =
+                new window.RetellSDK.RetellWebClient();
 
-        const data =
-            await response.json();
+            retellClient.on("call_started", () => {
 
-        retellClient =
-            new window.RetellSDK.RetellWebClient();
+                statusText.innerText =
+                    "Conversación activa";
 
-        retellClient.on("call_started", () => {
+                transcript.innerHTML = `
+                    <div class="message ai">
+                        Conversación iniciada.
+                    </div>
+                `;
+
+            });
+
+            retellClient.on("call_ended", () => {
+
+                finalizar();
+
+            });
+
+            retellClient.on("agent_start_talking", () => {
+
+                orb.classList.remove("user");
+                orb.classList.add("agent");
+
+                statusText.innerText =
+                    "Blanquita está hablando...";
+
+            });
+
+            retellClient.on("agent_stop_talking", () => {
+
+                orb.classList.remove("agent");
+
+                statusText.innerText =
+                    "Escuchando...";
+
+            });
+
+            retellClient.on("update", (update) => {
+
+                console.log(update);
+
+                try {
+
+                    let texto = null;
+
+                    if (update?.transcript) {
+                        texto = update.transcript;
+                    }
+
+                    if (update?.text) {
+                        texto = update.text;
+                    }
+
+                    if (!texto) {
+                        return;
+                    }
+
+                    const div =
+                        document.createElement("div");
+
+                    div.className = "message";
+
+                    div.innerHTML = texto;
+
+                    transcript.appendChild(div);
+
+                    transcript.scrollTop =
+                        transcript.scrollHeight;
+
+                } catch (err) {
+
+                    console.error(err);
+
+                }
+
+            });
+
+            await retellClient.startCall({
+                accessToken: data.access_token
+            });
+
+        } catch (error) {
+
+            console.error(error);
 
             statusText.innerText =
-                "Conversación activa";
+                "Error de conexión";
 
-            agregarMensaje(
-                "Conversación iniciada",
-                "message ai"
-            );
+            active = false;
 
-        });
+            button.innerText =
+                "Iniciar consulta";
+        }
 
-        retellClient.on("call_ended", () => {
+    } else {
 
-            finalizar();
+        if (retellClient) {
+            retellClient.stopCall();
+        }
 
-        });
-
-        retellClient.on("agent_start_talking", () => {
-
-            orb.classList.remove("user");
-
-            orb.classList.add("agent");
-
-            statusText.innerText =
-                "Blanquita está hablando...";
-
-        });
-
-        retellClient.on("agent_stop_talking", () => {
-
-            orb.classList.remove("agent");
-
-            statusText.innerText =
-                "Escuchando...";
-
-        });
-
-        retellClient.on("update", (update) => {
-
-            console.log(update);
-
-            try {
-
-                if (typeof update === "string") {
-
-                    agregarMensaje(update);
-
-                    return;
-                }
-
-                if (update?.transcript) {
-
-                    agregarMensaje(
-                        typeof update.transcript === "string"
-                            ? update.transcript
-                            : JSON.stringify(update.transcript)
-                    );
-
-                    return;
-                }
-
-                if (update?.text) {
-
-                    agregarMensaje(update.text);
-
-                    return;
-                }
-
-                if (update?.content) {
-
-                    agregarMensaje(update.content);
-
-                    return;
-                }
-
-                if (update?.message) {
-
-                    agregarMensaje(update.message);
-
-                    return;
-                }
-
-                if (update?.utterance) {
-
-                    agregarMensaje(update.utterance);
-
-                    return;
-                }
-
-                if (Array.isArray(update?.messages)) {
-
-                    update.messages.forEach(msg => {
-
-                        agregarMensaje(
-                            msg.content ||
-                            msg.text ||
-                            JSON.stringify(msg)
-                        );
-
-                    });
-
-                    return;
-                }
-
-            } catch (err) {
-
-                console.error(err);
-
-            }
-
-        });
-
-        await retellClient.startCall({
-
-            accessToken:
-                data.access_token
-
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        statusText.innerText =
-            "Error de conexión";
-
-        active = false;
-
-        button.innerText =
-            "Iniciar consulta";
-    }
-
-} else {
-
-    if (retellClient) {
-
-        retellClient.stopCall();
+        finalizar();
 
     }
-
-    finalizar();
-
-}
-```
 
 });
 
 function finalizar() {
 
-```
-active = false;
+    active = false;
 
-button.innerText =
-    "Iniciar consulta";
-
-statusText.innerText =
-    "Consulta finalizada";
-
-orb.classList.remove("agent");
-
-orb.classList.remove("user");
-
-setTimeout(() => {
-
-    transcript.innerHTML = `
-        <div class="placeholder">
-            La conversación aparecerá aquí.
-        </div>
-    `;
+    button.innerText =
+        "Iniciar consulta";
 
     statusText.innerText =
-        "Presione el botón para comenzar";
+        "Consulta finalizada";
 
-}, 10000);
-```
+    orb.classList.remove("agent");
+    orb.classList.remove("user");
+
+    setTimeout(() => {
+
+        transcript.innerHTML = `
+            <div class="placeholder">
+                La conversación aparecerá aquí.
+            </div>
+        `;
+
+        statusText.innerText =
+            "Presione el botón para comenzar";
+
+    }, 10000);
 
 }
