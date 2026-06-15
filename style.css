@@ -5,99 +5,122 @@
 }
 
 body{
-    background:#f5f8ff;
+    background:#f7f8f7;
     font-family:Arial,sans-serif;
-    height:100vh;
+    min-height:100vh;
 }
 
 .container{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    height:100vh;
-    padding:20px;
+    max-width:1000px;
+    margin:auto;
+    padding:30px;
+    text-align:center;
 }
 
 .logo{
-    font-size:56px;
-    font-weight:bold;
-    color:#1e5eff;
+    width:320px;
+    max-width:90%;
+    margin-bottom:10px;
 }
 
 .subtitle{
-    margin-top:10px;
-    color:#555;
-    font-size:20px;
+    font-size:24px;
+    color:#6e7d60;
+    margin-bottom:15px;
+}
+
+.welcome{
+    color:#666;
+    line-height:1.6;
+    margin-bottom:30px;
 }
 
 .orb-container{
-    margin:40px 0;
+    display:flex;
+    justify-content:center;
+    margin:30px 0;
 }
 
 .orb{
-    width:180px;
-    height:180px;
+    width:170px;
+    height:170px;
     border-radius:50%;
-    background:#2d7ff9;
-    box-shadow:0 0 50px rgba(45,127,249,.5);
+    background:#6e7d60;
+    box-shadow:0 0 40px rgba(110,125,96,.4);
     animation:pulse 2s infinite;
+    transition:.3s;
 }
 
-.orb.talking{
-    animation:pulseFast .5s infinite;
+.orb.agent{
+    background:#4b78ff;
+}
+
+.orb.user{
+    background:#3dbb6a;
 }
 
 @keyframes pulse{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.08);}
-    100%{transform:scale(1);}
-}
 
-@keyframes pulseFast{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.15);}
-    100%{transform:scale(1);}
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
 }
 
 .status{
     font-size:22px;
-    color:#333;
     margin-bottom:20px;
+    color:#444;
 }
 
 button{
-    border:none;
-    background:#2d7ff9;
+    background:#6e7d60;
     color:white;
+    border:none;
     padding:18px 35px;
     border-radius:12px;
     cursor:pointer;
     font-size:20px;
 }
 
+button:hover{
+    opacity:.9;
+}
+
 .transcript{
     margin-top:30px;
-    width:90%;
-    max-width:900px;
-    height:250px;
-    overflow-y:auto;
     background:white;
     border-radius:15px;
     padding:20px;
+    min-height:250px;
+    text-align:left;
     box-shadow:0 0 15px rgba(0,0,0,.08);
+    overflow-y:auto;
+}
+
+.placeholder{
+    color:#999;
 }
 
 .message{
-    margin-bottom:12px;
+    margin-bottom:15px;
     line-height:1.5;
-    font-size:18px;
 }
 
 .ai{
-    color:#1e5eff;
+    color:#4b78ff;
+    font-weight:bold;
 }
 
-.user{
-    color:#222;
+.userText{
+    color:#3dbb6a;
+    font-weight:bold;
 }
