@@ -6,7 +6,7 @@
 
 body{
     background:#f5f8ff;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
     height:100vh;
 }
 
@@ -32,7 +32,7 @@ body{
 }
 
 .orb-container{
-    margin:50px 0;
+    margin:40px 0;
 }
 
 .orb{
@@ -44,24 +44,26 @@ body{
     animation:pulse 2s infinite;
 }
 
+.orb.talking{
+    animation:pulseFast .5s infinite;
+}
+
 @keyframes pulse{
-    0%{
-        transform:scale(1);
-    }
+    0%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+    100%{transform:scale(1);}
+}
 
-    50%{
-        transform:scale(1.08);
-    }
-
-    100%{
-        transform:scale(1);
-    }
+@keyframes pulseFast{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.15);}
+    100%{transform:scale(1);}
 }
 
 .status{
-    font-size:24px;
-    margin-bottom:25px;
+    font-size:22px;
     color:#333;
+    margin-bottom:20px;
 }
 
 button{
@@ -74,12 +76,8 @@ button{
     font-size:20px;
 }
 
-button:hover{
-    opacity:.9;
-}
-
 .transcript{
-    margin-top:40px;
+    margin-top:30px;
     width:90%;
     max-width:900px;
     height:250px;
@@ -93,6 +91,7 @@ button:hover{
 .message{
     margin-bottom:12px;
     line-height:1.5;
+    font-size:18px;
 }
 
 .ai{
