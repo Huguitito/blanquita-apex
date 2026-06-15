@@ -4,75 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APEX Odontología - Recepción</title>
-    <!-- SDK Oficial de Retell según el manual -->
     <script src="https://unpkg.com/retell-client-js-sdk/dist/retell-client-js-sdk.js"></script>
     <style>
         body { font-family: sans-serif; background-color: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .card { text-align: center; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 450px; }
-        .logo { width: 180px; margin-bottom: 20px; }
-        h1 { color: #333; font-size: 26px; margin-bottom: 10px; }
-        p { color: #666; font-size: 18px; margin-bottom: 35px; line-height: 1.4; }
-        #start-btn { 
-            background-color: #00a896; color: white; border: none; padding: 22px 45px; 
-            font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; 
-            transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0, 168, 150, 0.3);
-        }
-        #start-btn:active { transform: scale(0.95); }
-        #start-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-        .status-msg { margin-top: 25px; font-weight: bold; color: #00a896; min-height: 24px; }
+        #start-btn { background-color: #00a896; color: white; border: none; padding: 22px 45px; font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; }
+        #start-btn:disabled { background-color: #ccc; }
+        .status-msg { margin-top: 25px; font-weight: bold; color: #00a896; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <div style="font-size: 40px; margin-bottom: 15px;">🦷</div>
-        <h1>¡Hola! Bienvenido a APEX</h1>
-        <p>Por favor, tocá el botón para anunciar tu llegada o solicitar un turno.</p>
+        <div style="font-size: 50px;">🦷</div>
+        <h1>Bienvenido a APEX</h1>
+        <p>Tocá el botón para anunciar tu llegada.</p>
         <button id="start-btn">ANUNCIAR MI LLEGADA</button>
         <div id="status-msg" class="status-msg"></div>
     </div>
 
     <script>
-        // SEGÚN MANUAL: La clase se llama RetellWebClient directamente
-        const retellWebClient = new RetellWebClient();
+        // ESTA ES LA LÍNEA QUE CORRIGE EL ERROR DE LA CAPTURA:
+        const retellWebClient = new Retell.RetellWebClient();
+        
         const btn = document.getElementById('start-btn');
         const status = document.getElementById('status-msg');
 
         btn.addEventListener('click', async () => {
             try {
                 btn.disabled = true;
-                status.innerText = "Conectando con Blanquita...";
+                status.innerText = "Conectando...";
 
-                // Pedimos el token a nuestra API segura en Vercel
                 const response = await fetch('/api/create-web-call', { method: 'POST' });
                 const data = await response.json();
 
-                if (!data.access_token) {
-                    throw new Error("No se recibió el token de Retell");
-                }
+                if (!data.access_token) throw new Error("No token");
 
-                // Iniciamos la llamada usando el token
                 await retellWebClient.startCall({
                     accessToken: data.access_token,
                 });
 
-                status.innerText = "Blanquita te está escuchando...";
-                btn.innerText = "EN CONVERSACIÓN";
+                status.innerText = "Blanquita te escucha...";
+                btn.innerText = "HABLANDO...";
 
             } catch (err) {
-                console.error("Error detallado:", err);
-                status.innerText = "Error al conectar. Probá de nuevo.";
+                console.error(err);
+                status.innerText = "Error de conexión.";
                 btn.disabled = false;
                 btn.innerText = "ANUNCIAR MI LLEGADA";
             }
         });
 
-        // Escuchamos el fin de la llamada para resetear el botón
         retellWebClient.on("call_ended", () => {
-            status.innerText = "¡Listo! Ya avisamos a los doctores.";
+            status.innerText = "¡Listo! Ya avisamos.";
             btn.disabled = false;
             btn.innerText = "ANUNCIAR MI LLEGADA";
-            setTimeout(() => { status.innerText = ""; }, 5000);
         });
     </script>
 </body>
