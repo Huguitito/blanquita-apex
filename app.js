@@ -1,53 +1,90 @@
 const button = document.getElementById("callButton");
 const statusText = document.getElementById("status");
 const transcript = document.getElementById("transcript");
+const orb = document.getElementById("orb");
 
 let active = false;
+let retellClient = null;
 
-button.addEventListener("click", () => {
+button.addEventListener("click", async () => {
 
     if(!active){
 
-        active = true;
+        try{
 
-        button.innerText = "Finalizar consulta";
-        statusText.innerText = "Conectando con la recepcionista...";
+            active = true;
 
-        addMessage(
-            "ai",
-            "Hola, bienvenido a APEX Odontología. ¿En qué puedo ayudarlo?"
-        );
+            button.innerText = "Finalizar consulta";
+            statusText.innerText = "Conectando con Blanquita...";
 
-    } else {
+            const response = await fetch("/api/create-web-call");
 
-        active = false;
+            const data = await response.json();
 
-        button.innerText = "Iniciar consulta";
-        statusText.innerText = "Consulta finalizada";
+            retellClient = new window.RetellWebClient();
 
-        setTimeout(() => {
+            retellClient.on("call_started", () => {
+                statusText.innerText = "Conversación activa";
+            });
 
-            statusText.innerText =
-                "Presione el botón para comenzar";
+            retellClient.on("call_ended", () => {
+                finalizar();
+            });
 
-            transcript.innerHTML = "";
+            retellClient.on("agent_start_talking", () => {
+                orb.classList.add("talking");
+                statusText.innerText = "Blanquita está hablando...";
+            });
 
-        },10000);
+            retellClient.on("agent_stop_talking", () => {
+                orb.classList.remove("talking");
+                statusText.innerText = "Escuchando...";
+            });
+
+            await retellClient.startCall({
+                accessToken: data.access_token
+            });
+
+        }catch(error){
+
+            console.error(error);
+
+            statusText.innerText = "Error de conexión";
+
+            active = false;
+
+            button.innerText = "Iniciar consulta";
+        }
+
+    }else{
+
+        if(retellClient){
+            retellClient.stopCall();
+        }
+
+        finalizar();
 
     }
 
 });
 
-function addMessage(type,text){
+function finalizar(){
 
-    const div = document.createElement("div");
+    active = false;
 
-    div.className = `message ${type}`;
+    button.innerText = "Iniciar consulta";
 
-    div.innerHTML = text;
+    statusText.innerText = "Consulta finalizada";
 
-    transcript.appendChild(div);
+    orb.classList.remove("talking");
 
-    transcript.scrollTop = transcript.scrollHeight;
+    setTimeout(() => {
+
+        transcript.innerHTML = "";
+
+        statusText.innerText =
+            "Presione el botón para comenzar";
+
+    },10000);
 
 }
