@@ -1,0 +1,104 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f5f8ff;
+    font-family:Arial, sans-serif;
+    height:100vh;
+}
+
+.container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+    padding:20px;
+}
+
+.logo{
+    font-size:56px;
+    font-weight:bold;
+    color:#1e5eff;
+}
+
+.subtitle{
+    margin-top:10px;
+    color:#555;
+    font-size:20px;
+}
+
+.orb-container{
+    margin:50px 0;
+}
+
+.orb{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:#2d7ff9;
+    box-shadow:0 0 50px rgba(45,127,249,.5);
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+}
+
+.status{
+    font-size:24px;
+    margin-bottom:25px;
+    color:#333;
+}
+
+button{
+    border:none;
+    background:#2d7ff9;
+    color:white;
+    padding:18px 35px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:20px;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+.transcript{
+    margin-top:40px;
+    width:90%;
+    max-width:900px;
+    height:250px;
+    overflow-y:auto;
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 0 15px rgba(0,0,0,.08);
+}
+
+.message{
+    margin-bottom:12px;
+    line-height:1.5;
+}
+
+.ai{
+    color:#1e5eff;
+}
+
+.user{
+    color:#222;
+}
