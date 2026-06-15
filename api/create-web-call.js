@@ -1,8 +1,5 @@
 export default async function handler(req, res) {
-  // Solo permitimos peticiones POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Método no permitido' });
-  }
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   try {
     const response = await fetch("https://api.retellai.com/v2/create-web-call", {
@@ -16,12 +13,7 @@ export default async function handler(req, res) {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Error de Retell: ${response.status}`);
-    }
-
     const data = await response.json();
-    // Le devolvemos el token a la web
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
