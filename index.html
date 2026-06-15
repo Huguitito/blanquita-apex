@@ -30,17 +30,19 @@
         Iniciar consulta
     </button>
 
-    <div id="transcript" class="transcript">
-    </div>
+    <div id="transcript" class="transcript"></div>
 
 </div>
 
 <script type="module">
-    import RetellWebClient from 'https://cdn.jsdelivr.net/npm/retell-client-js-sdk/+esm';
-    window.RetellWebClient = RetellWebClient;
-</script>
+    import * as RetellSDK from 'https://cdn.jsdelivr.net/npm/retell-client-js-sdk/+esm';
 
-<script src="app.js"></script>
+    window.RetellSDK = RetellSDK;
+
+    const script = document.createElement('script');
+    script.src = 'app.js';
+    document.body.appendChild(script);
+</script>
 
 </body>
 </html>
