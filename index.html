@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APEX Odontología - Recepción</title>
-    <!-- Cargamos el SDK oficial de Retell -->
+    <!-- SDK Oficial de Retell según el manual -->
     <script src="https://unpkg.com/retell-client-js-sdk/dist/retell-client-js-sdk.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        body { font-family: sans-serif; background-color: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .card { text-align: center; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 450px; }
         .logo { width: 180px; margin-bottom: 20px; }
         h1 { color: #333; font-size: 26px; margin-bottom: 10px; }
         p { color: #666; font-size: 18px; margin-bottom: 35px; line-height: 1.4; }
-        
         #start-btn { 
             background-color: #00a896; color: white; border: none; padding: 22px 45px; 
             font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; 
@@ -20,26 +19,22 @@
         }
         #start-btn:active { transform: scale(0.95); }
         #start-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-
         .status-msg { margin-top: 25px; font-weight: bold; color: #00a896; min-height: 24px; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- Reemplazaremos esto por el logo real de APEX luego -->
         <div style="font-size: 40px; margin-bottom: 15px;">🦷</div>
         <h1>¡Hola! Bienvenido a APEX</h1>
         <p>Por favor, tocá el botón para anunciar tu llegada o solicitar un turno.</p>
-
         <button id="start-btn">ANUNCIAR MI LLEGADA</button>
-        
         <div id="status-msg" class="status-msg"></div>
     </div>
 
     <script>
-        // Inicializamos el cliente de Retell
-        const retellWebClient = new RetellClient.RetellWebClient();
+        // SEGÚN MANUAL: La clase se llama RetellWebClient directamente
+        const retellWebClient = new RetellWebClient();
         const btn = document.getElementById('start-btn');
         const status = document.getElementById('status-msg');
 
@@ -48,13 +43,15 @@
                 btn.disabled = true;
                 status.innerText = "Conectando con Blanquita...";
 
-                // Pedimos el token de acceso a nuestra API de Vercel
+                // Pedimos el token a nuestra API segura en Vercel
                 const response = await fetch('/api/create-web-call', { method: 'POST' });
                 const data = await response.json();
 
-                if (!data.access_token) throw new Error("No se pudo obtener el token");
+                if (!data.access_token) {
+                    throw new Error("No se recibió el token de Retell");
+                }
 
-                // Iniciamos la llamada de voz
+                // Iniciamos la llamada usando el token
                 await retellWebClient.startCall({
                     accessToken: data.access_token,
                 });
@@ -63,20 +60,18 @@
                 btn.innerText = "EN CONVERSACIÓN";
 
             } catch (err) {
-                console.error(err);
-                status.innerText = "Hubo un error. Reintentá por favor.";
+                console.error("Error detallado:", err);
+                status.innerText = "Error al conectar. Probá de nuevo.";
                 btn.disabled = false;
                 btn.innerText = "ANUNCIAR MI LLEGADA";
             }
         });
 
-        // Cuando la llamada termina, reseteamos el botón
+        // Escuchamos el fin de la llamada para resetear el botón
         retellWebClient.on("call_ended", () => {
             status.innerText = "¡Listo! Ya avisamos a los doctores.";
             btn.disabled = false;
             btn.innerText = "ANUNCIAR MI LLEGADA";
-            
-            // Limpiamos el mensaje después de 5 segundos para el próximo paciente
             setTimeout(() => { status.innerText = ""; }, 5000);
         });
     </script>
