@@ -30,6 +30,12 @@ button.addEventListener("click", async () => {
                 statusText.innerText =
                     "Conversación activa";
 
+                transcript.innerHTML = `
+                    <div class="message ai">
+                        Conversación iniciada.
+                    </div>
+                `;
+
             });
 
             retellClient.on("call_ended", () => {
@@ -40,7 +46,8 @@ button.addEventListener("click", async () => {
 
             retellClient.on("agent_start_talking", () => {
 
-                orb.classList.add("talking");
+                orb.classList.remove("user");
+                orb.classList.add("agent");
 
                 statusText.innerText =
                     "Blanquita está hablando...";
@@ -49,7 +56,7 @@ button.addEventListener("click", async () => {
 
             retellClient.on("agent_stop_talking", () => {
 
-                orb.classList.remove("talking");
+                orb.classList.remove("agent");
 
                 statusText.innerText =
                     "Escuchando...";
@@ -59,6 +66,40 @@ button.addEventListener("click", async () => {
             retellClient.on("update", (update) => {
 
                 console.log(update);
+
+                try {
+
+                    let texto = null;
+
+                    if (update?.transcript) {
+                        texto = update.transcript;
+                    }
+
+                    if (update?.text) {
+                        texto = update.text;
+                    }
+
+                    if (!texto) {
+                        return;
+                    }
+
+                    const div =
+                        document.createElement("div");
+
+                    div.className = "message";
+
+                    div.innerHTML = texto;
+
+                    transcript.appendChild(div);
+
+                    transcript.scrollTop =
+                        transcript.scrollHeight;
+
+                } catch (err) {
+
+                    console.error(err);
+
+                }
 
             });
 
@@ -101,11 +142,16 @@ function finalizar() {
     statusText.innerText =
         "Consulta finalizada";
 
-    orb.classList.remove("talking");
+    orb.classList.remove("agent");
+    orb.classList.remove("user");
 
     setTimeout(() => {
 
-        transcript.innerHTML = "";
+        transcript.innerHTML = `
+            <div class="placeholder">
+                La conversación aparecerá aquí.
+            </div>
+        `;
 
         statusText.innerText =
             "Presione el botón para comenzar";
